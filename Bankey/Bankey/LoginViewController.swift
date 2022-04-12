@@ -11,6 +11,15 @@ class LoginViewController: UIViewController {
     
     let loginView = LoginView()
     let signInButton = UIButton(type: .system)
+    let errorMessageLabel = UILabel()
+    
+    var username: String? {
+        return loginView.usernameTextField.text
+    }
+    
+    var password: String? {
+        return loginView.passwordTextField.text
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,12 +38,19 @@ extension LoginViewController {
         signInButton.configuration = .filled()
         signInButton.configuration?.imagePadding = 8 // for indicator spacing
         signInButton.setTitle("Sign In", for: [])
-        //signInButton.addTarget(self, action: #selector(signInTapped), for: .primaryActionTriggered)
+        signInButton.addTarget(self, action: #selector(signInTapped), for: .primaryActionTriggered)
+        
+        errorMessageLabel.translatesAutoresizingMaskIntoConstraints = false
+        errorMessageLabel.textAlignment = .center
+        errorMessageLabel.textColor = .systemRed
+        errorMessageLabel.numberOfLines = 0
+        errorMessageLabel.isHidden = true
     }
     
     private func layout() {
         view.addSubview(loginView)
         view.addSubview(signInButton)
+        view.addSubview(errorMessageLabel)
         
         //LoginView
         NSLayoutConstraint.activate([
@@ -49,10 +65,37 @@ extension LoginViewController {
             signInButton.leadingAnchor.constraint(equalToSystemSpacingAfter: view.leadingAnchor, multiplier: 2),
             view.trailingAnchor.constraint(equalToSystemSpacingAfter: signInButton.trailingAnchor, multiplier: 2)
         ])
+        
+        //ErrorMessage
+        NSLayoutConstraint.activate([
+            errorMessageLabel.topAnchor.constraint(equalToSystemSpacingBelow: signInButton.bottomAnchor, multiplier: 2),
+            errorMessageLabel.leadingAnchor.constraint(equalToSystemSpacingAfter: view.leadingAnchor, multiplier: 2),
+            view.trailingAnchor.constraint(equalToSystemSpacingAfter: errorMessageLabel.trailingAnchor, multiplier: 2)
+        ])
     }
 }
 
 // MARK: Actions
 extension LoginViewController {
+    @objc func signInTapped(sender: UIButton) {
+        errorMessageLabel.isHidden = true
+        
+        login()
+    }
     
+    private func login() {
+        guard let username = username, let password = password else {
+            assertionFailure("Username and password should not be nil")
+            return
+        }
+        
+        if username.isEmpty || password.isEmpty {
+            configureView(withMessage: "Username / password cannnot be blank")
+        }
+    }
+    
+    private func configureView(withMessage message: String) {
+        errorMessageLabel.isHidden = false
+        errorMessageLabel.text = message
+    }
 }
