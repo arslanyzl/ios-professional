@@ -7,12 +7,22 @@
 
 import UIKit
 
+protocol OnboardingContainerViewControllerDelegate: AnyObject {
+    func didFinishOnboarding()
+}
+
 class OnboardingContainerViewController: UIViewController {
 
     let pageViewController: UIPageViewController
     var pages = [UIViewController]()
-    var currentVC: UIViewController
+    weak var delegate: OnboardingContainerViewControllerDelegate?
+    
     let closeButton = UIButton(type: .system)
+    let nextButton = UIButton(type: .system)
+    let backButton = UIButton(type: .system)
+    let doneButton = UIButton(type: .system)
+    
+    var currentVC: UIViewController
     
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -124,7 +134,20 @@ extension OnboardingContainerViewController: UIPageViewControllerDataSource {
 
 //MARK: - Actions
 extension OnboardingContainerViewController {
+    @objc func backTapped(_ sender: UIButton) {
+        guard let previousVC = getPreviousViewController(from: currentVC) else {return}
+        
+        pageViewController.setViewControllers([previousVC], direction: .reverse, animated: true, completion: nil)
+    }
+    
     @objc func closeTapped(_ sender: UIButton) {
-        //TODO
+        delegate?.didFinishOnboarding()
+    }
+    
+    @objc func nextTapped(_ sender: UIButton) {
+        guard let nextVC = getNextViewController(from: currentVC) else {return}
+        
+        pageViewController.setViewControllers([nextVC], direction: .reverse, animated: true, completion: nil)
     }
 }
+
