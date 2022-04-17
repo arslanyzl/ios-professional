@@ -11,8 +11,14 @@ protocol LoginViewControllerDelegate: AnyObject {
     func didLogin()
 }
 
+protocol LogoutDelegate: AnyObject {
+    func didLogout()
+}
+
 class LoginViewController: UIViewController {
     
+    let titleLabel = UILabel()
+    let bodyLabel = UILabel()
     let loginView = LoginView()
     let signInButton = UIButton(type: .system)
     let errorMessageLabel = UILabel()
@@ -33,11 +39,28 @@ class LoginViewController: UIViewController {
         style()
         layout()
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        signInButton.configuration?.showsActivityIndicator = false
+        loginView.usernameTextField.text = ""
+        loginView.passwordTextField.text = ""
+    }
 
 }
 
 extension LoginViewController {
     private func style() {
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.text = "Bankley"
+        titleLabel.font = .preferredFont(forTextStyle: .title1)
+        
+        bodyLabel.translatesAutoresizingMaskIntoConstraints = false
+        bodyLabel.text = "Your Premium source for all things banking!"
+        //bodyLabel.font = .preferredFont(forTextStyle: .title)
+        bodyLabel.numberOfLines = 0
+        
+        
         loginView.translatesAutoresizingMaskIntoConstraints = false
         
         signInButton.translatesAutoresizingMaskIntoConstraints = false
@@ -54,9 +77,23 @@ extension LoginViewController {
     }
     
     private func layout() {
+        view.addSubview(titleLabel)
+        view.addSubview(bodyLabel)
         view.addSubview(loginView)
         view.addSubview(signInButton)
         view.addSubview(errorMessageLabel)
+        
+        //Title
+        NSLayoutConstraint.activate([
+            bodyLabel.topAnchor.constraint(equalToSystemSpacingBelow: titleLabel.bottomAnchor, multiplier: 3),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        //bodyTitle
+        NSLayoutConstraint.activate([
+            loginView.topAnchor.constraint(equalToSystemSpacingBelow: bodyLabel.bottomAnchor, multiplier: 6),
+            bodyLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
         
         //LoginView
         NSLayoutConstraint.activate([
